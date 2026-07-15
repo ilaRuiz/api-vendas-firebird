@@ -1,0 +1,15 @@
+{
+  "name": "api-vendas-firebird",
+  "version": "1.0.0",
+  "description": "Middleware REST para consultar dados do Firebird usados pelo site de vendas.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "node-firebird": "^1.1.9"
+  }
+}

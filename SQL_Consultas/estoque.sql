@@ -1,0 +1,20 @@
+SELECT
+    xe.codproduto,
+    xe.codproduto_clas,
+    xe.dscproduto,
+    xe.dscproduto_clas,
+    xe.qtd_estoque,
+    xe.preco_custo,
+    xe.preco_venda,
+    xe.codgrupo,
+    xe.dscagrupamento,
+    xe.und_medida,
+    xe.marca,
+    xe.cod_ncm,
+    xe.ref_fabrica,
+    xe.codbarras,
+    xe.estoque_minimo,
+    xe.localizacao,
+    xe.ref_paralela,
+    xe.data_atualizacao
+FROM x_estoque xe;
