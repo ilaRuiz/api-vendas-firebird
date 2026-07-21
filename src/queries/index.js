@@ -43,6 +43,11 @@ const queryFiles = {
     route: 'operacoes',
     file: 'Operacoes.sql',
     description: 'Lista operacoes de venda permitidas.'
+  },
+  cidades: {
+    route: 'cidades',
+    file: 'cidades.sql',
+    description: 'Lista cidades e respectivos estados.'
   }
 };
 

@@ -66,6 +66,36 @@ async function withDatabase(databaseConfig, callback) {
   }
 }
 
+async function withTransaction(databaseConfig, callback) {
+  const database = await attach(databaseConfig);
+
+  try {
+    return await new Promise((resolve, reject) => {
+      database.transaction(Firebird.ISOLATION_READ_COMMITTED, async (error, transaction) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        try {
+          const result = await callback(transaction);
+          transaction.commit((commitError) => commitError ? reject(commitError) : resolve(result));
+        } catch (callbackError) {
+          transaction.rollback(() => reject(callbackError));
+        }
+      });
+    });
+  } finally {
+    database.detach();
+  }
+}
+
+function executeTransaction(transaction, sql, params = []) {
+  return new Promise((resolve, reject) => {
+    transaction.query(sql, params, (error, result) => error ? reject(error) : resolve(result));
+  });
+}
+
 function query(database, sql, params = []) {
   return new Promise((resolve, reject) => {
     database.query(sql, params, (error, result) => {
@@ -95,6 +125,8 @@ function execute(database, sql, params = []) {
 module.exports = {
   createDatabaseRegistry,
   execute,
+  executeTransaction,
   query,
+  withTransaction,
   withDatabase
 };
