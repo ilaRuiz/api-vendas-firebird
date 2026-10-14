@@ -4,6 +4,12 @@ Middleware Node.js para disponibilizar consultas do banco Firebird em REST.
 
 ## Configuracao
 
+Copie `config.example.json` para `config.json` e preencha os dados de um banco de teste. O template contém placeholders e mantém o scheduler desativado. O arquivo `config.json` é local e está no `.gitignore`; não publique credenciais.
+
+```powershell
+Copy-Item config.example.json config.json
+```
+
 Edite o arquivo `config.json`:
 
 - `server.port`: porta da API.
@@ -21,8 +27,8 @@ Exemplo para adicionar outro banco:
   "host": "127.0.0.1",
   "port": 3050,
   "database": "D:\\Dados\\Filial2.FDB",
-  "user": "SYSDBA",
-  "password": "masterkey",
+  "user": "USUARIO_API",
+  "password": "SUBSTITUA_POR_SENHA_FORTE",
   "lowercase_keys": false,
   "role": null,
   "pageSize": 4096
@@ -141,10 +147,25 @@ As consultas sao lidas dos arquivos da pasta `SQL_Consultas` quando a API inicia
 
 ## Timer
 
-Por padrao a aplicacao executa a cada 1 minuto:
+Quando habilitado em `config.json`, o timer pode executar a procedure abaixo. O template mantém `scheduler.enabled` e `scheduler.runOnStart` em `false` para evitar processamento automático durante a configuração:
 
 ```sql
 EXECUTE PROCEDURE X_PROCESSA_ESTOQUE_PENDENTE(50)
 ```
 
 Altere `scheduler.enabled` para `false` se quiser desligar temporariamente.
+
+
+## Segurança e exposição da API
+
+- A implementação atual não possui autenticação nem autorização nas rotas de leitura e gravação. Não publique esta API diretamente na internet. Para uso em rede, restrinja o acesso com firewall/VPN ou um gateway com autenticação e autorização; HTTPS sozinho não controla o acesso.
+- Os scripts `start-ngrok.bat`, `start-ngrok-hidden.vbs` e `Executavel_API.bat` abrem um túnel para a porta 3000. Não os execute com banco real sem controles de acesso revisados.
+- `server.corsOrigin` aceita uma origem exata, por exemplo `http://localhost:8080`, ou um array de origens. Se omitido ou vazio, o código usa `*`. CORS limita leitura por navegadores; não autentica clientes nem bloqueia chamadas diretas.
+- O código atual chama `app.listen(port)` sem endereço de bind. Não há opção `server.host` implementada, e a mensagem com `localhost` no console não garante escuta restrita ao computador. Restrinja a porta no firewall e confirme a interface de escuta antes do uso.
+- Use um usuário Firebird exclusivo para a integração com os privilégios mínimos necessários. Credenciais administrativas e senhas padrão, mesmo usadas como exemplo, não são adequadas em produção. Os placeholders devem ser substituídos localmente; não são credenciais funcionais.
+- As consultas retornam dados pessoais e comerciais. Revise as colunas retornadas, remova campos de senha da resposta em uma alteração funcional separada e aplique autorização por usuário, filial e banco antes de expor consultas.
+- As rotas com alias permitem selecionar qualquer banco configurado; alias não é uma fronteira de autorização. Valide também preços, descontos, operador, filial e totais dos pedidos no servidor em uma mudança separada e testada.
+- Endpoints de diagnóstico e mensagens de erro podem revelar caminhos e metadados internos. Evite disponibilizá-los publicamente; planeje respostas de erro genéricas e logs internos sem dados sensíveis.
+- Mantenha `config.json`, `.env`, backups e bancos reais fora do Git. Se credenciais reais já tiverem sido publicadas, rotacione-as e revise o histórico; trocar exemplos não revoga credenciais.
+
+Este ajuste altera somente documentação e um template não carregado automaticamente. Ele não corrige os controles de segurança do aplicativo em execução nem modifica configurações já implantadas.

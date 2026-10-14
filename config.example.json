@@ -1,0 +1,32 @@
+{
+  "server": {
+    "port": 3000,
+    "corsOrigin": "http://localhost:8080"
+  },
+  "firebird": {
+    "defaultDatabase": "principal",
+    "generators": {
+      "parceiro": "GEN_PARCEIRO"
+    },
+    "databases": [
+      {
+        "alias": "principal",
+        "host": "127.0.0.1",
+        "port": 3050,
+        "database": "C:\\Dados\\Exemplo.FDB",
+        "user": "USUARIO_API",
+        "password": "SUBSTITUA_POR_SENHA_FORTE",
+        "lowercase_keys": false,
+        "role": null,
+        "pageSize": 4096
+      }
+    ]
+  },
+  "scheduler": {
+    "enabled": false,
+    "intervalMs": 60000,
+    "runOnStart": false,
+    "databaseAlias": "principal",
+    "procedureSql": "EXECUTE PROCEDURE X_PROCESSA_ESTOQUE_PENDENTE(50)"
+  }
+}
